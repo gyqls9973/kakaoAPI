@@ -1,4 +1,3 @@
-import {inspect} from "util";
 import {useEffect, useState} from "react";
 import styled from '@emotion/styled';
 
@@ -8,7 +7,7 @@ interface MapProps {
 }
 
 function Map({latitude, longitude}: MapProps) {
-    const [kakaoLating, setKakoLating] = useState({lat: 0, lng: 0}); //경도, 위도 가져오기
+    const [kakaoLating, setKakoLating] = useState({lat: 35.14668438859065, lng: 126.84733058734534}); //경도, 위도 가져오기(임시 기본값: 세정아울렛)
 
     //geolocation으로 마커 표시하기
     const displayMarker = (locPosition, message) => {
@@ -27,20 +26,31 @@ function Map({latitude, longitude}: MapProps) {
         map.setCenter(locPosition);
     };
 
-    //현재 위치 찾기
+    //geolocation 위치 찾기
     const myLat = () => {
         if(navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function (position) {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
+                const lat = 35.16015604139172;//position.coords.latitude
+                const lon = 126.85162986081089; //position.coords.longitude
                 const locPosition = new window.kakao.maps.LatLng(lat, lon);
-                const message = '<div style="padding: 5px">나의 현재 위치</div>'
+                const message = '<div style="padding: 5px">광주 시청 위치</div>'
                 displayMarker(locPosition, message);
                 console.log(locPosition);
             })
         }
     }
 
+    //로드뷰 보기
+    const roadView = () => {
+        const roadViewContainer = document.getElementById("roadView");
+        const roadView = new window.kakao.maps.Roadview(roadViewContainer); //로드뷰 객체
+        const roadViewClient = new window.kakao.maps.RoadviewClient(); //좌표로부터 로드뷰 파노ID를 가져올 로드뷰 helper객체
+
+        const position = new window.kakao.maps.LatLng(35.14668438859065, 126.84733058734534);
+        roadViewClient.getNearestPanoId(position, 50, function (panold) {
+            roadView.setPanoId(panold, position);
+        })
+    }
 
     useEffect(() => {
         //kakao map appkey 받아오기
@@ -78,10 +88,12 @@ function Map({latitude, longitude}: MapProps) {
 
     return (
         <>
-            <MapContainer id="map" />
-            <div id="clickLating"/>
-            <div><a href={`https://map.kakao.com/link/to/세정아울렛,${kakaoLating.lat},${kakaoLating.lng}`}>세정아울렛 길찾기(카카오 오픈API의 경우 길찾기 기능 제공X - 카카오맵으로 연동)</a></div>
-            {/*<div onClick={myLat}>현재 위치 찾기</div>*/}
+            <MapContainer id="map" /> {/*지도 뿌려주기*/}
+            <DivStyle id="clickLating"/> {/*지도 클릭시 해당 경도, 위도값 노출*/}
+            <DivStyle><a href={`https://map.kakao.com/link/to/세정아울렛,${kakaoLating.lat},${kakaoLating.lng}`}>세정아울렛 길찾기(카카오 오픈API의 경우 길찾기 기능 제공X - 카카오맵으로 연동)</a></DivStyle>
+            <DivStyle onClick={myLat}>광주 시청 찾기</DivStyle>
+            <DivStyle onClick={roadView}>세정아울렛 로드뷰 보기</DivStyle>
+            <MapContainer id="roadView"/>
         </>
     );
 }
@@ -94,6 +106,18 @@ declare global {
 
 const MapContainer = styled.div`
   aspect-ratio: 320 / 220;
+  width: 800px;
+  heigth: 600px;
 `;
+
+const DivStyle = styled.div`
+  font-size: 20px;
+  border-radius: 4px;
+  padding: 16px
+  text-align: center;
+  &:hover {
+  color: blue;
+  }
+`
 
 export default Map;
