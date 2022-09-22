@@ -41,6 +41,7 @@ function Map({latitude, longitude}: MapProps) {
         }
     }
 
+
     useEffect(() => {
         //kakao map appkey 받아오기
         const mapScript = document.createElement("script");
