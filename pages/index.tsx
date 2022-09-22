@@ -49,6 +49,16 @@ export default function Home() {
               Instantly deploy your Next.js site to a public URL with Vercel.
             </p>
           </a>
+
+          <a
+            href="/kakao"
+            className={styles.card}
+          >
+            <h2>Kakao Map &rarr;</h2>
+            <p>
+              kakao Map.
+            </p>
+          </a>
         </div>
       </main>
 
